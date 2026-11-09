@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="ckb" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دووگردکان</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #d4a373;
+            --primary-dark: #b07d4f;
+            --bg-dark: #121212;
+            --bg-card: #1e1e1e;
+            --text-light: #f8f9fa;
+            --text-muted: #a0a0a0;
+            --accent: #e63946;
+            --transition: all 0.3s ease;
+        }
+
+        /* شێوازی کارتی قاوە و نیشاندانی هەنگاوەکان */
+        .coffee-card { position: relative; cursor: pointer; }
+
+        .steps-popup {
+            display: none;
+            position: static;
+            margin-top: 18px;
+            background-color: rgba(255, 255, 255, 0.04);
+            color: var(--text-light);
+            padding: 16px;
+            border-radius: 12px;
+            width: 100%;
+            direction: rtl;
+            text-align: right;
+            border: 1px solid rgba(212, 163, 115, 0.2);
+        }
+        .steps-popup h4 {
+            color: var(--accent);
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 6px;
+        }
+        .steps-popup ul { list-style: none; padding: 0; margin: 0; }
+        .steps-popup li {
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .steps-popup li span {
+            background-color: var(--accent);
+            color: var(--bg-card);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.75rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Noto Sans Arabic', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Header & Navigation */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 8%;
+            background: rgba(18, 18, 18, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: var(--transition);
+        }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .nav-links { display: flex; list-style: none; gap: 30px; }
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        .nav-links a:hover { color: var(--primary); }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--bg-dark);
+            padding: 10px 24px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: var(--transition);
+            border: 2px solid var(--primary);
+            display: inline-block;
+            cursor: pointer;
+        }
+        .btn-primary:hover {
+            background: transparent;
+            color: var(--primary);
+            box-shadow: 0 0 15px rgba(212, 163, 115, 0.4);
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(135deg, rgba(0,0,0,0.85), rgba(18,18,18,0.7)),
+                        url('https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&q=80&w=1920') center/cover no-repeat;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0 20px;
+        }
+        .hero-content { max-width: 800px; animation: fadeIn 1s ease-in-out; }
+        .hero-content h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: var(--text-light);
+            line-height: 1.2;
+        }
+        .hero-content span { color: var(--primary); }
+        .hero-content p { font-size: 1.2rem; color: var(--text-muted); margin-bottom: 30px; }
+        .hero-btns { display: flex; gap: 15px; justify-content: center; }
+
+        /* About Section */
+        .section { padding: 100px 8%; }
+        .section-title { text-align: center; margin-bottom: 60px; }
+        .section-title h2 { font-size: 2.5rem; color: var(--primary); margin-bottom: 10px; }
+        .section-title p { color: var(--text-muted); }
+
+        .about-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+        .about-img {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+        .about-img img { width: 100%; height: auto; display: block; transition: var(--transition); }
+        .about-img:hover img { transform: scale(1.05); }
+        .about-text h3 { font-size: 2rem; margin-bottom: 20px; line-height: 1.4; }
+        .about-text p { color: var(--text-muted); margin-bottom: 20px; }
+
+        /* Menu Section */
+        .menu-grid {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 30px;
+            align-items: flex-start;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            padding: 15px 5px 30px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .menu-grid > .menu-card {
+            flex: 0 0 290px;
+            scroll-snap-align: start;
+        }
+        .menu-card {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: var(--transition);
+            position: relative;
+        }
+        .menu-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(212, 163, 115, 0.15);
+        }
+        .menu-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        .menu-card h4 { font-size: 1.3rem; margin-bottom: 10px; }
+        .menu-card p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px; }
+        .price { font-size: 1.2rem; font-weight: 700; color: var(--primary); }
+
+        /* Zoomed card + blurred background */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            display: flex;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.55);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            overflow-y: auto;
+            animation: overlayIn 0.25s ease;
+        }
+        .menu-card.zoomed {
+            width: min(430px, 100%);
+            margin: auto;
+            cursor: default;
+            animation: zoomIn 0.3s ease;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+        }
+        .menu-card.zoomed:hover { transform: none; }
+        .menu-card.zoomed img { height: 240px; }
+        .close-btn {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(0, 0, 0, 0.6);
+            color: var(--text-light);
+            font-size: 1.2rem;
+            cursor: pointer;
+            z-index: 5;
+        }
+        .close-btn:hover { background: var(--accent); }
+        @keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Footer */
+        footer {
+            background: #0a0a0a;
+            padding: 50px 8% 20px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            text-align: center;
+        }
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .social-links a {
+            color: var(--text-light);
+            font-size: 1.5rem;
+            margin: 0 10px;
+            transition: var(--transition);
+        }
+        .social-links a:hover { color: var(--primary); }
+        .copyright {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 20px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            header { padding: 15px 5%; }
+            .nav-links { display: none; }
+            .hero-content h1 { font-size: 2.3rem; }
+            .about-container { grid-template-columns: 1fr; }
+        }
+    </style>
+
+    <!-- ===== زیادکراوەکان (Extras): هیچ کۆدێکی پێشوو نەگۆڕدراوە ===== -->
+    <style>
+        section[id], footer[id] { scroll-margin-top: 80px; }
+
+        .address {
+            color: var(--text-light);
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+        .address i { color: var(--primary); margin-inline-end: 8px; }
+
+        .nav-links a { position: relative; }
+        .nav-links a::after {
+            content: "";
+            position: absolute;
+            inset-inline: 0;
+            bottom: -6px;
+            height: 2px;
+            background: var(--primary);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        .nav-links a.active { color: var(--primary); }
+        .nav-links a.active::after { transform: scaleX(1); }
+
+        .menu-toggle {
+            display: none;
+            width: 42px;
+            height: 42px;
+            margin-inline-start: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            background: transparent;
+            cursor: pointer;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        .menu-toggle span {
+            display: block;
+            width: 20px;
+            height: 2px;
+            background: var(--text-light);
+            border-radius: 2px;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        .menu-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .menu-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+        .menu-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        .mobile-nav {
+            position: fixed;
+            top: 76px;
+            inset-inline: 0;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            padding: 10px 8% 24px;
+            background: rgba(18, 18, 18, 0.97);
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-12px);
+            transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+        }
+        .mobile-nav.open { opacity: 1; visibility: visible; transform: none; }
+        .mobile-nav a {
+            padding: 14px 4px;
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .mobile-nav a.active { color: var(--primary); }
+
+        @media (max-width: 768px) { .menu-toggle { display: flex; } }
+        @media (min-width: 769px) { .mobile-nav { display: none; } }
+
+        .to-top {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            width: 46px;
+            height: 46px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            border: 2px solid var(--primary);
+            background: var(--bg-card);
+            color: var(--primary);
+            cursor: pointer;
+            z-index: 900;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+        .to-top.show { opacity: 1; visibility: visible; transform: none; }
+        .to-top:hover { background: var(--primary); color: var(--bg-dark); }
+        .to-top svg { width: 20px; height: 20px; }
+
+        .menu-toggle:focus-visible,
+        .to-top:focus-visible,
+        .mobile-nav a:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 3px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .menu-toggle span, .mobile-nav, .to-top, .nav-links a::after { transition: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="#" class="logo">
+            <i class="fa-solid font-awesome fa-coffee"></i> دووگردکان
+        </a>
+        <ul class="nav-links">
+            <li><a href="#hero">سەرەتا</a></li>
+            <li><a href="#about">دەربارە</a></li>
+            <li><a href="#menu">مێنیو</a></li>
+            <li><a href="#contact">پەیوەندی</a></li>
+        </ul>
+        <a href="#menu" class="btn-primary">داواکاری بکە</a>
+    </header>
+
+    <section class="hero" id="hero">
+        <div class="hero-content">
+            <h1>چێژ لە <span>قاوەی ڕاستەقینە</span> و کەشێکی ئارام وەربگرە</h1>
+            <p>باشترین تۆوی قاوەی جیهانی بە دەستی شارەزایان بۆ تۆ ئامادە دەکرێت. تامی جیاواز لە هەر قۆمێکدا.</p>
+            <div class="hero-btns">
+                <a href="#menu" class="btn-primary">مێنیوی قاوە</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="about">
+        <div class="about-container">
+            <div class="about-img">
+                <img src="https://images.unsplash.com/photo-1442512595331-e89e73853f31?auto=format&fit=crop&q=80&w=800" alt="کافێ">
+            </div>
+            <div class="about-text">
+                <h3>ئێمە کێین؟ <br>چیرۆکی کافێکەی ئێمە</h3>
+                <p>ئێمە لێرەین بۆ ئەوەی بەرزترین کوالێتی قاوە پێشکەش بە ئارەزوومەندانی ئەم خوارنەوەیە بکەین. هەمیشە کار لەسەر ئەوە دەکەین کەشێکی ئارام و شایستە بۆ پشوو و کۆبوونەوەکانتان فەراهەم بکەین.</p>
+                <p>هەموو دانە قاوەیەک بە وردی هەڵدەبژێردرێت و برژێنرێت تا تامی ڕەسەنی خۆی بپارێزێت.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="menu">
+        <div class="section-title">
+            <h2>مێنیوی تایبەت</h2>
+            <p>تامی جۆراوجۆری قاوە و شیرینییەکانمان تاقی بکەرەوە</p>
+        </div>
+
+        <div class="menu-grid">
+            <!-- Card 1 -->
+            <div class="menu-card coffee-card" onclick="toggleSteps(this)">
+                <img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&q=80&w=500" alt="ئێسپڕێسۆ">
+                <h4>ئێسپڕێسۆ (Espresso)</h4>
+                <p>قاوەیەکی خەست و بەهێز بە تامی ڕەسەنی ئیتالی</p>
+                <div class="price">3,000 دینار</div>
+                <div class="steps-popup">
+                    <h4>هەنگاوەکانی دروستکردن:</h4>
+                    <ul>
+                        <li><span>١</span> هارینی دەنگە قهوەی کوالێتی بەرز</li>
+                        <li><span>٢</span> پەستاوتنی قهوە هاراوەکە</li>
+                        <li><span>٣</span> هەڵگرتنی ئاوی گەرم بە فشار</li>
+                        <li><span>٤</span> پێشکەشکردنی قهوەی ئیسپریسۆی ئامادەکراو</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="menu-card coffee-card" onclick="toggleSteps(this)">
+                <img src="https://images.unsplash.com/photo-1534778101976-62847782c213?auto=format&fit=crop&q=80&w=500" alt="کاپوچینۆ">
+                <h4>کاپوچینۆ (Cappuccino)</h4>
+                <p>تێکەڵەیەک لە ئێسپڕێسۆ و شیری گەرم کراو بە کەفی نەرم</p>
+                <div class="price">4,500 دینار</div>
+                <div class="steps-popup">
+                    <h4>هەنگاوەکانی دروستکردن:</h4>
+                    <ul>
+                        <li><span>١</span> دروستکردنی ئێسپڕێسۆیەک</li>
+                        <li><span>٢</span> گەرمکردنی شیر بە هەڵم تا کەفی نەرم دروست بێت</li>
+                        <li><span>٣</span> ڕشتنی شیرەکە بەسەر ئێسپڕێسۆدا</li>
+                        <li><span>٤</span> دانانی کەفەکە لەسەرەوە و پێشکەشکردن</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="menu-card coffee-card" onclick="toggleSteps(this)">
+                <img src="https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?auto=format&fit=crop&q=80&w=500" alt="لاتێ">
+                <h4>کافێ لاتێ (Caffè Latte)</h4>
+                <p>تاعمێکی نەرم و هێمنکەرەوە بە شیری شلکراوەوە</p>
+                <div class="price">4,500 دینار</div>
+                <div class="steps-popup">
+                    <h4>هەنگاوەکانی دروستکردن:</h4>
+                    <ul>
+                        <li><span>١</span> دروستکردنی ئێسپڕێسۆیەک</li>
+                        <li><span>٢</span> گەرمکردنی شیر بە کەفێکی کەم</li>
+                        <li><span>٣</span> ڕشتنی شیرەکە بە هێواشی بەسەر قاوەکەدا</li>
+                        <li><span>٤</span> پێشکەشکردنی لاتێی ئامادەکراو</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="menu-card coffee-card" onclick="toggleSteps(this)">
+                <img src="https://images.unsplash.com/photo-1517256064527-09c73fc73e38?auto=format&fit=crop&q=80&w=500" alt="سارد">
+                <h4>ئایس ئامێریکانۆ (Iced Americano)</h4>
+                <p>خواردنەوەیەکی فێنککەرەوە بۆ ڕۆژە گەرمەکان</p>
+                <div class="price">4,000 دینار</div>
+                <div class="steps-popup">
+                    <h4>هەنگاوەکانی دروستکردن:</h4>
+                    <ul>
+                        <li><span>١</span> دروستکردنی ئێسپڕێسۆیەک</li>
+                        <li><span>٢</span> کردنی ئاوی سارد و سههۆڵ لە پەرداخەکەدا</li>
+                        <li><span>٣</span> ڕشتنی ئێسپڕێسۆ بەسەریدا</li>
+                        <li><span>٤</span> تێکەڵکردن و پێشکەشکردن</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer id="contact">
+        <div class="footer-content">
+            <div class="logo">
+                <i class="fa-solid fa-coffee"></i> دووگردکان
+            </div>
+            <div class="social-links">
+                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                <a href="#"><i class="fa-brands fa-tiktok"></i></a>
+            </div>
+        </div>
+        <p class="address">
+            <i class="fa-solid fa-location-dot"></i>
+            ناونیشان: سەر ڕێگای مەخمور، گوندی دووگردکان
+        </p>
+        <div class="copyright">
+            <p>&copy; 2026 دووگردکان. هەموو مافەکانی پارێزراوە.</p>
+        </div>
+    </footer>
+
+    <script>
+        function closeCard() {
+            const overlay = document.querySelector('.overlay');
+            if (overlay) overlay.remove();
+            document.body.style.overflow = '';
+        }
+
+        function toggleSteps(cardElement) {
+            closeCard();
+
+            const overlay = document.createElement('div');
+            overlay.className = 'overlay';
+
+            const card = cardElement.cloneNode(true);
+            card.removeAttribute('onclick');
+            card.classList.add('zoomed');
+            card.querySelector('.steps-popup').style.display = 'block';
+
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'close-btn';
+            closeBtn.setAttribute('aria-label', 'داخستن');
+            closeBtn.textContent = '✕';
+            closeBtn.addEventListener('click', closeCard);
+            card.appendChild(closeBtn);
+
+            overlay.appendChild(card);
+            overlay.addEventListener('click', function (e) {
+                if (e.target === overlay) closeCard();
+            });
+
+            document.body.appendChild(overlay);
+            document.body.style.overflow = 'hidden';
+        }
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeCard();
+        });
+    </script>
+
+    <!-- ===== زیادکراوەکان (Extras) ===== -->
+    <script>
+        (function () {
+            var header = document.querySelector('header');
+            var navList = document.querySelector('.nav-links');
+            var ids = ['hero', 'about', 'menu', 'contact'];
+
+            // 1) مینیوی مۆبایل
+            var toggle = document.createElement('button');
+            toggle.className = 'menu-toggle';
+            toggle.setAttribute('aria-label', 'مینیو');
+            toggle.setAttribute('aria-expanded', 'false');
+            toggle.innerHTML = '<span></span><span></span><span></span>';
+            header.appendChild(toggle);
+
+            var panel = document.createElement('nav');
+            panel.className = 'mobile-nav';
+            navList.querySelectorAll('a').forEach(function (a) {
+                var link = document.createElement('a');
+                link.href = a.getAttribute('href');
+                link.textContent = a.textContent;
+                panel.appendChild(link);
+            });
+            document.body.appendChild(panel);
+
+            function setMenu(open) {
+                panel.style.top = header.offsetHeight + 'px';
+                panel.classList.toggle('open', open);
+                toggle.setAttribute('aria-expanded', String(open));
+            }
+            toggle.addEventListener('click', function () {
+                setMenu(!panel.classList.contains('open'));
+            });
+            panel.addEventListener('click', function (e) {
+                if (e.target.tagName === 'A') setMenu(false);
+            });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') setMenu(false);
+            });
+            window.addEventListener('resize', function () {
+                if (window.innerWidth > 768) setMenu(false);
+            });
+
+            // 2) دوگمەی گەڕانەوە بۆ سەرەوە
+            var toTop = document.createElement('button');
+            toTop.className = 'to-top';
+            toTop.setAttribute('aria-label', 'بگەڕێوە بۆ سەرەوە');
+            toTop.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
+            toTop.addEventListener('click', function () {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+            document.body.appendChild(toTop);
+
+            // 3) دیاریکردنی لینکی چالاک + پیشاندانی دوگمەی سەرەوە
+            var links = document.querySelectorAll('.nav-links a, .mobile-nav a');
+            function onScroll() {
+                var y = window.scrollY;
+                toTop.classList.toggle('show', y > 600);
+
+                var current = 'hero';
+                ids.forEach(function (id) {
+                    var el = document.getElementById(id);
+                    if (el && el.getBoundingClientRect().top <= 140) current = id;
+                });
+                if (window.innerHeight + y >= document.documentElement.scrollHeight - 4) current = 'contact';
+
+                links.forEach(function (a) {
+                    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+                });
+            }
+            window.addEventListener('scroll', onScroll, { passive: true });
+            onScroll();
+        })();
+    </script>
+
+    <!-- ===== مۆسیقا (Music): فایلی music.mp3 لە تەنیشت index.html دابنێ ===== -->
+    <style>
+        .music-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 46px;
+            height: 46px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            border: 2px solid var(--primary);
+            background: var(--bg-card);
+            color: var(--primary);
+            cursor: pointer;
+            z-index: 900;
+            transition: var(--transition);
+        }
+        .music-btn:hover { background: var(--primary); color: var(--bg-dark); }
+        .music-btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+        .music-btn svg { width: 20px; height: 20px; }
+        .music-btn .icon-pause { display: none; }
+        .music-btn.playing .icon-note { display: none; }
+        .music-btn.playing .icon-pause { display: block; }
+        .music-btn.playing { box-shadow: 0 0 0 0 rgba(212, 163, 115, 0.5); animation: musicPulse 2s infinite; }
+        @keyframes musicPulse {
+            0% { box-shadow: 0 0 0 0 rgba(212, 163, 115, 0.5); }
+            70% { box-shadow: 0 0 0 14px rgba(212, 163, 115, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(212, 163, 115, 0); }
+        }
+        @media (prefers-reduced-motion: reduce) { .music-btn.playing { animation: none; } }
+    </style>
+
+    <audio id="bgMusic" src="music.mp3" loop preload="auto"></audio>
+
+    <script>
+        (function () {
+            var audio = document.getElementById('bgMusic');
+            var btn = document.createElement('button');
+            btn.className = 'music-btn';
+            btn.setAttribute('aria-label', 'مۆسیقا');
+            btn.setAttribute('aria-pressed', 'false');
+            btn.innerHTML =
+                '<svg class="icon-note" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 3v11.2A3.5 3.5 0 1 0 11 17V8h7V3H9z"/></svg>' +
+                '<svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>';
+            document.body.appendChild(btn);
+
+            audio.volume = 0.4;
+
+            var userPaused = false;
+            var autoEvents = ['pointerdown', 'keydown', 'touchend'];
+
+            function setState(on) {
+                btn.classList.toggle('playing', on);
+                btn.setAttribute('aria-pressed', String(on));
+                if (on) stopWaiting();
+            }
+
+            function stopWaiting() {
+                autoEvents.forEach(function (ev) {
+                    document.removeEventListener(ev, startOnInteraction, true);
+                });
+            }
+
+            // ئەگەر براوزەر ڕێگەی نەدا، لەگەڵ یەکەم کلیک/دەستلێدان دەست پێدەکات
+            function startOnInteraction(e) {
+                if (btn.contains(e.target) || userPaused) return;
+                audio.play().then(function () { setState(true); }).catch(function () {});
+            }
+
+            // هەوڵدان بۆ دەستپێکردنی خۆکار کاتێک پەیجەکە دەکرێتەوە
+            audio.play().then(function () {
+                setState(true);
+            }).catch(function () {
+                autoEvents.forEach(function (ev) {
+                    document.addEventListener(ev, startOnInteraction, true);
+                });
+            });
+
+            btn.addEventListener('click', function () {
+                if (audio.paused) {
+                    userPaused = false;
+                    audio.play().then(function () {
+                        setState(true);
+                    }).catch(function () {
+                        setState(false);
+                        alert('فایلی music.mp3 نەدۆزرایەوە. دڵنیابە لە تەنیشت index.html دانراوە.');
+                    });
+                } else {
+                    userPaused = true;
+                    audio.pause();
+                    setState(false);
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
